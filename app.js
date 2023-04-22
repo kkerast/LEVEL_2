@@ -1,55 +1,33 @@
 const express = require("express");
 const app = express();
-
 app.set("port", process.env.PORT || 3000);
+const connect = require("./schemas/");
+const postsRouter = require("./routes/posts.js");
 
-app.get("/", (req, res) => {
-  res.send("Hello, Express");
+connect();
+
+app.use(express.json());
+
+app.use("/api", [postsRouter]);
+
+app.use((req, res, next) => {
+  // 404 처리 부분
+  res.status(404).send(`<!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <title>Error</title>
+    </head>
+    <body>
+      <pre>Cannot GET /</pre>
+    </body>
+  </html>`);
 });
 
-app
-  .get("/api/posts", (req, res) => {
-    // GET /api/posts : 전체 게시글 목록 조회 API
-    res.send("Hello, Express");
-  })
-  .post("/api/posts", (req, res) => {
-    // POST /api/posts : 게시글 작성 API
-    res.send("Hello, Express");
-  });
-
-app.get("/api/posts/:id", (req, res) => {
-  // GET /api/posts/:id : 게시글 조회 API
-  res.send("Hello, Express");
-});
-
-app.put("/api/posts/:id", (req, res) => {
-  // PUT /api/posts/:id : 게시글 수정 API
-  res.send("Hello, Express");
-});
-
-app.delete("/api/posts/:id", (req, res) => {
-  // DELETE /api/posts/:id : 게시글 삭제 API
-  res.send("Hello, Express");
-});
-
-app.get("/api/posts/:id", (req, res) => {
-  // GET /api/posts/:id/comments : 댓글 목록 조회 API
-  res.send("Hello, Express");
-});
-
-app.post("/api/posts/:id/comments", (req, res) => {
-  // POST /api/posts/:id/comments : 댓글 작성 API
-  res.send("Hello, Express");
-});
-
-app.put("/api/posts/:id/comments/:commentId", (req, res) => {
-  // PUT /api/posts/:id/comments/:commentId : 댓글 수정 API
-  res.send("Hello, Express");
-});
-
-app.delete("/api/posts/:id/comments/:commentId", (req, res) => {
-  // DELETE /api/posts/:id/comments/:commentId : 댓글 삭제 API
-  res.send("Hello, Express");
+app.use((err, req, res, next) => {
+  // 에러 처리 부분
+  console.error(err.stack); // 에러 메시지 표시
+  res.status(500).send("서버 에러!"); // 500 상태 표시 후 에러 메시지 전송
 });
 
 app.listen(app.get("port"), () => {
