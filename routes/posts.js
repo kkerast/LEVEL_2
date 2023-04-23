@@ -1,6 +1,16 @@
 const express = require("express");
 const post_router = express.Router();
-const Posts = require("../schemas/posts");
+const Posts = require("../schemas/post");
+
+// GET /posts : 게시글 조회 API
+post_router.get("/posts", async (req, res) => {
+  let posts = await Posts.find({}, { password: 0, __v: 0 });
+  //const list = JSON.stringify(posts);
+
+  res.json({ data: posts });
+  //res.send("게시글 조회 API");
+});
+
 // post /posts : 게시글 생성 API
 post_router.post("/posts", async (req, res) => {
   const { user, password, title, content } = req.body;
@@ -22,15 +32,6 @@ post_router.post("/posts", async (req, res) => {
 
   // res.json({ message: "게시글을 생성하였습니다." });
   res.send({ message: "게시글을 생성하였습니다." });
-});
-
-// GET /posts : 게시글 조회 API
-post_router.get("/posts", async (req, res) => {
-  let posts = await Posts.find({}, { password: 0, __v: 0 });
-  //const list = JSON.stringify(posts);
-
-  res.json({ data: posts });
-  //res.send("게시글 조회 API");
 });
 
 // GET /posts/:id : 게시글 상세조회 API
