@@ -2,13 +2,15 @@ const express = require("express");
 const app = express();
 app.set("port", process.env.PORT || 3000);
 const connect = require("./schemas/");
-const postsRouter = require("./routes/posts.js");
+const { postsRouter, commentsRouter } = require("./routes");
+//const postsRouter = require("./routes/posts");
 
 connect();
 
 app.use(express.json());
 
-app.use("/api", [postsRouter]);
+app.use("/posts", [postsRouter]);
+app.use("/posts/:_postId/comments", [commentsRouter]);
 
 app.use((req, res, next) => {
   // 404 처리 부분

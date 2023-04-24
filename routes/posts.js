@@ -3,8 +3,8 @@ const post_router = express.Router();
 const Posts = require("../schemas/post");
 
 // GET /posts : 게시글 조회 API
-post_router.get("/posts", async (req, res) => {
-  let posts = await Posts.find({}, { password: 0, __v: 0 });
+post_router.get("/", async (req, res) => {
+  let posts = await Posts.find({}, { password: 0, content: 0, __v: 0 });
   //const list = JSON.stringify(posts);
 
   res.json({ data: posts });
@@ -12,35 +12,45 @@ post_router.get("/posts", async (req, res) => {
 });
 
 // post /posts : 게시글 생성 API
-post_router.post("/posts", async (req, res) => {
+post_router.post("/", async (req, res) => {
   const { user, password, title, content } = req.body;
-  const newPost = {
+  if (!user || !password || !title || !content) {
+    return res
+      .status(400)
+      .json({ message: "데이터 형식이 올바르지 않습니다." });
+  }
+  await Posts.create({
     user,
     password,
     title,
     content,
-  };
-
-  await Posts.create(newPost)
+  })
     .then((post) => {
-      console.log("New post saved successfully!");
+      //console.log("New post saved successfully!");
       console.log(post);
+      //res.send({ message: "게시글을 생성하였습니다." });
+      res.status(201).json({ message: "게시글을 생성하였습니다." });
     })
     .catch((error) => {
-      console.error(error);
+      //console.error(error);
+      res.status(400).json({ message: "데이터 형식이 올바르지 않습니다." });
     });
 
   // res.json({ message: "게시글을 생성하였습니다." });
-  res.send({ message: "게시글을 생성하였습니다." });
+  // res.send({ message: "게시글을 생성하였습니다." });
 });
 
 // GET /posts/:id : 게시글 상세조회 API
-post_router.get("/posts/:id", async (req, res) => {
+post_router.get("/:id", async (req, res) => {
   console.log("req : ", req.params);
   const { id } = req.params;
   console.log("_id : ", id);
-
-  const posts = await Posts.find({ _id: id }, { __v: 0 });
+  if (!id) {
+    return res
+      .status(400)
+      .json({ message: "데이터 형식이 올바르지 않습니다." });
+  }
+  const posts = await Posts.findOne({ _id: id }, { __v: 0 });
   // const list = JSON.stringify(posts);
   console.log(posts);
 
@@ -50,7 +60,7 @@ post_router.get("/posts/:id", async (req, res) => {
 });
 
 // PUT /posts/:id : 게시글 수정 API
-post_router.put("/posts/:id", async (req, res) => {
+post_router.put("/:id", async (req, res) => {
   console.log("req : ", req.params);
   const { id } = req.params;
   console.log("_id : ", id);
@@ -71,7 +81,7 @@ post_router.put("/posts/:id", async (req, res) => {
 });
 
 // DELETE /posts/:id : 게시글 삭제 API
-post_router.delete("/posts/:id", async (req, res) => {
+post_router.delete("/:id", async (req, res) => {
   console.log("req : ", req.params);
   const { id } = req.params;
   console.log("_id : ", id);
@@ -79,8 +89,14 @@ post_router.delete("/posts/:id", async (req, res) => {
   const posts = await Posts.findByIdAndDelete(id);
   // const list = JSON.stringify(posts);
   console.log(posts);
+  if (posts === null) {
+    res.status(400).json({
+      message: "message: '게시글 조회에 실패하였습니다.",
+    });
+  } else {
+    res.json({ message: "게시글을 삭제하였습니다." });
+  }
 
-  res.json({ data: posts });
   //res.send("게시글 삭제 API");
 });
 
