@@ -31,6 +31,7 @@ postsSchema.virtual("postId").get(function () {
   return this._id.toHexString(); // 이 부분의 this._id에 해당하는 부분을 가상화 시킨다.
 });
 //postsSchema.set("toJSON", { virtuals: true });
+
 postsSchema.set("toJSON", {
   virtuals: true,
   versionKey: false,
@@ -49,7 +50,6 @@ postsSchema.set("toJSON", {
       content: ret.content,
       createdAt: ret.createdAt,
     };
-
     return ordered;
   },
 });

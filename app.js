@@ -12,24 +12,30 @@ app.use(express.json());
 app.use("/posts", [postsRouter]);
 app.use("/posts/:_postId/comments", [commentsRouter]);
 
-app.use((req, res, next) => {
-  // 404 처리 부분
-  res.status(404).send(`<!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="utf-8">
-      <title>Error</title>
-    </head>
-    <body>
-      <pre>Cannot GET /</pre>
-    </body>
-  </html>`);
-});
+// app.use((req, res, next) => {
+//   // 404 처리 부분
+//   res.status(404).send(`<!DOCTYPE html>
+//   <html lang="en">
+//     <head>
+//       <meta charset="utf-8">
+//       <title>Error</title>
+//     </head>
+//     <body>
+//       <pre>Cannot GET /</pre>
+//     </body>
+//   </html>`);
+// });
 
+// app.use(function(req, res, next) {
+//   // error 생성 후 next
+//   next(createError(404));
+// });
+
+// error handler
 app.use((err, req, res, next) => {
-  // 에러 처리 부분
-  console.error(err.stack); // 에러 메시지 표시
-  res.status(500).send("서버 에러!"); // 500 상태 표시 후 에러 메시지 전송
+  const status = err.status || 500;
+
+  res.status(status).send({ message: err.message });
 });
 
 app.listen(app.get("port"), () => {
