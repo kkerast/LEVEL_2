@@ -32,10 +32,12 @@ app.use("/posts/:_postId/comments", [commentsRouter]);
 // });
 
 // error handler
-app.use((err, req, res, next) => {
-  const status = err.status || 500;
-
-  res.status(status).send({ message: err.message });
+app.use((error, req, res, next) => {
+  console.error(error.stack);
+  console.log("에러 발생 ");
+  const status = error.status || 500;
+  const message = error.message || "Internal 500 Error";
+  res.status(status).json({ message: message });
 });
 
 app.listen(app.get("port"), () => {

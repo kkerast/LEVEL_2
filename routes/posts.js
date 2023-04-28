@@ -54,8 +54,6 @@ post_router.get("/:id", async (req, res, next) => {
 
 // PUT /posts/:id : 게시글 수정 API
 post_router.put("/:id", async (req, res, next) => {
-  //TODO : throw 만들어주기
-
   try {
     console.log("req : ", req.params);
     const { id } = req.params;
@@ -74,11 +72,21 @@ post_router.put("/:id", async (req, res, next) => {
 
     // const list = JSON.stringify(posts);
     console.log(posts);
-
+    if (!password || !title || !content) {
+      const error = new Error("데이터 형식이 올바르지 않습니다.");
+      error.status = 400;
+      throw error;
+    }
     // res.json({ data: posts });
-    res.send("게시글 수정 API");
+    if (comments.modifiedCount) {
+      res.send("댓글을 수정하였습니다.");
+    } else {
+      const error = new Error("댓글 조회에 실패하였습니다.");
+      error.status = 404;
+      throw error;
+    }
   } catch (error) {
-    error.status = 400;
+    // error.status = 400;
     return next(error);
   }
 });
@@ -99,7 +107,9 @@ post_router.delete("/:id", async (req, res, next) => {
     console.log(posts);
     if (posts.deletedCount === 0) {
       //throw new Error("게시글 조회에 실패하였습니다.").status(404);
-      throw { message: "게시글 조회에 실패하였습니다", status: 404 };
+      const error = new Error("게시글 조회에 실패하였습니다");
+      error.status = 404;
+      throw error;
     }
 
     //else {
