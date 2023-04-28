@@ -1,10 +1,80 @@
-1. [항해99 파트타임 1기]주특기 1주차 LEVEL_1
+[항해99 파트타임 1기]주특기 1주차 LEVEL_1
+=============
 
-2. 프로젝트 정보
+
    -# Node.js Lv.1
    **Goal: "Node.js와 express로 로그인 기능이 없는 나만의 항해 블로그 백엔드 서버 만들기"**
 
-**Requirement: 과제에 요구되는 사항이에요.**
+
+
+
+
+
+
+
+
+
+# 프로젝트 세팅
+
+```
+npm init
+npm install express / npm i express
+npm install mongoose
+```
+
+# AWS 세팅
+
+## 0.AWS EC2 우분투 20.04
+
+## 1.node js 설치
+```
+curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+### 1-1 node 버전확인
+```
+node -v
+```
+## 2.mongo DB설치 
+```
+sudo apt-get install gnupg
+```
+```
+curl -fsSL https://pgp.mongodb.com/server-6.0.asc | \
+   sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg \
+   --dearmor
+```
+```
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+```
+```
+sudo apt-get update
+```
+```
+sudo apt-get install -y mongodb-org
+```
+```
+echo "mongodb-org hold" | sudo dpkg --set-selections
+echo "mongodb-org-database hold" | sudo dpkg --set-selections
+echo "mongodb-org-server hold" | sudo dpkg --set-selections
+echo "mongodb-mongosh hold" | sudo dpkg --set-selections
+echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
+echo "mongodb-org-tools hold" | sudo dpkg --set-selections
+```
+
+## 3. 80포트로 들어오는거 3000포트로 포트포워딩
+```
+sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 3000
+```
+
+
+## 4.mongo DB 실행
+```
+sudo systemctl start mongod
+sudo systemctl daemon-reload
+```
+
+# **Requirement: 과제에 요구되는 사항이에요.**
 
 - `1) 서비스 완성`, `2) Directory Structure`, `3) AWS 배포` 세 가지를 모두 완수해야 합니다.
 
@@ -61,7 +131,7 @@
      - mongoDB를 EC2 내부에 설치해서 연결하기
      - 배포 후 ip 주소를 제출해주세요!
 
-**Node 입문주차 과제 API**
+# **Node 입문주차 과제 API**
 
 | 기능               | API URL                                | Method | request(가져 갈 데이터)                                                                                     | response(서버로부터 받아올 데이터)                                                                                                                                                                                                                                                                         | Response(error)                                                                                                                                                                                                                                                                 |
 | :----------------- | :------------------------------------- | :----- | :---------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
