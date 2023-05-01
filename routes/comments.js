@@ -1,25 +1,29 @@
 const express = require("express");
 const comments_router = express.Router({ mergeParams: true });
 const Comment = require("../schemas/comment");
+const middleWare = require("../middlewares/auth-middleware");
 
 // POST /posts/:id/comments : 댓글 작성 API
-comments_router.post("/", async (req, res, next) => {
+comments_router.post("/", middleWare, async (req, res, next) => {
   //console.log("req : ", req.params);
   const { _postId } = req.params;
+  const { nickname, id } = res.locals.user;
   //console.log("_postId : ", _postId);
   try {
-    const { user, password, content } = req.body;
+    const { comment } = req.body;
     const newComment = {
-      user,
-      password,
-      content,
+      comment: comment,
+      userId: id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       postId: _postId,
     };
-    if (!content) {
+    if (!comment) {
       throw new Error("댓글 내용을 입력해주세요");
-    } else if (!user || !password) {
-      throw new Error("데이터 형식이 올바르지 않습니다.");
     }
+    // else if (!user || !password) {
+    //   throw new Error("데이터 형식이 올바르지 않습니다.");
+    // }
 
     await Comment.create(newComment)
       .then((post) => {
@@ -52,7 +56,7 @@ comments_router.get("/", async (req, res, next) => {
     // const list = JSON.stringify(comments);
     console.log(comments);
 
-    res.json({ data: comments });
+    res.json({ comments: comments });
     //res.send("댓글 목록 조회 API");
   } catch (error) {
     error.status = 400;
@@ -61,24 +65,25 @@ comments_router.get("/", async (req, res, next) => {
 });
 
 // PUT /posts/:id/comments/:commentId : 댓글 수정 API
-comments_router.put("/:commentId", async (req, res, next) => {
+comments_router.put("/:commentId", middleWare, async (req, res, next) => {
   //console.log("req : ", req.params);
   try {
     const { _postId, commentId } = req.params;
+    const { nickname, id } = res.locals.user;
     console.log("_postId : ", _postId);
     console.log("commentId : ", commentId);
 
     console.log(req.body);
 
-    const { password, content } = req.body;
+    const { comment } = req.body;
 
-    console.log(password, content);
+    console.log(comment);
     if (!_postId || !commentId) {
       const error = new Error("데이터 형식이 올바르지 않습니다.");
       error.status = 400;
       throw error;
     }
-    if (!content) {
+    if (!comment) {
       const error = new Error("댓글 내용을 입력해주세요");
       error.status = 400;
       throw error;
@@ -86,7 +91,7 @@ comments_router.put("/:commentId", async (req, res, next) => {
     // Post.updateOne({ _id: id, password: password }, { title, content })
     const comments = await Comment.updateOne(
       { _id: commentId },
-      { content: content }
+      { comment: comment, updatedAt: new Date() }
     );
 
     // const list = JSON.stringify(posts);
@@ -108,10 +113,11 @@ comments_router.put("/:commentId", async (req, res, next) => {
 });
 
 // DELETE /posts/:id/comments/:commentId : 댓글 삭제 API
-comments_router.delete("/:commentId", async (req, res, next) => {
+comments_router.delete("/:commentId", middleWare, async (req, res, next) => {
   //console.log("req : ", req.params);
   try {
     const { _postId, commentId } = req.params;
+    const { nickname, id } = res.locals.user;
     console.log("_postId : ", _postId);
     console.log("commentId : ", commentId);
     if (!_postId || !commentId) {

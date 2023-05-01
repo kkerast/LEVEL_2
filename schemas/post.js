@@ -2,24 +2,25 @@ const mongoose = require("mongoose");
 
 const postsSchema = new mongoose.Schema(
   {
-    // postId: {
-    //   type: String,
-    //   default: "temp",
-    // },
-    user: {
+    userId: {
       type: String,
-      required: true,
+    },
+    nickname: {
+      type: String,
     },
     title: {
+      type: String,
+    },
+    content: {
       type: String,
     },
     createdAt: {
       type: Date,
       default: Date.now,
-      unique: true,
     },
-    content: {
-      type: String,
+    updatedAt: {
+      type: Date,
+      default: Date.now,
     },
     password: {
       type: String,
@@ -45,10 +46,12 @@ postsSchema.set("toJSON", {
     // 원하는 순서대로 객체를 생성
     const ordered = {
       postId: postId,
-      user: ret.user,
+      userId: ret.userId,
+      nickname: ret.nickname,
       title: ret.title,
       content: ret.content,
       createdAt: ret.createdAt,
+      updatedAt: ret.updatedAt,
     };
     return ordered;
   },

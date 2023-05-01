@@ -1,5 +1,7 @@
 const express = require("express");
+const cookiePaser = require("cookie-parser");
 const app = express();
+
 app.set("port", process.env.PORT || 3000);
 const connect = require("./schemas/");
 const { authosRouter, postsRouter, commentsRouter } = require("./routes");
@@ -8,7 +10,10 @@ const { authosRouter, postsRouter, commentsRouter } = require("./routes");
 connect();
 
 app.use(express.json());
-console.log("app.js");
+app.use(cookiePaser());
+
+//console.log("app.js");
+
 app.use("/", [authosRouter]);
 app.use("/posts", [postsRouter]);
 app.use("/posts/:_postId/comments", [commentsRouter]);

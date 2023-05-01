@@ -1,6 +1,8 @@
 const express = require("express");
+const JWT = require("jsonwebtoken");
 const authos_router = express.Router();
 const Autho = require("../schemas/autho");
+const middleWare = require("../middlewares/auth-middleware");
 
 function error_message(status, message) {
   const error = new Error(message);
@@ -8,6 +10,7 @@ function error_message(status, message) {
   return error;
 }
 
+//회원가입 API
 authos_router.post("/signup", async (req, res, next) => {
   try {
     console.log("start signup");
@@ -59,6 +62,7 @@ authos_router.post("/signup", async (req, res, next) => {
   }
 });
 
+//로그인 API
 authos_router.post("/login", async (req, res, next) => {
   try {
     const { nickname, password } = req.body;
@@ -66,26 +70,41 @@ authos_router.post("/login", async (req, res, next) => {
     // {"errorMessage": "닉네임 또는 패스워드를 확인해주세요."}
     // # 400 예외 케이스에서 처리하지 못한 에러
     // {"errorMessage": "로그인에 실패하였습니다."}
-    const valid_nickname = await Autho.findOne({
+    const user = await Autho.findOne({
       nickname: nickname,
       password: password,
     }).exec();
 
-    if (!valid_nickname) {
-      throw { errorMessage: "닉네임 또는 패스워드를 확인해주세요." };
-    } else {
-      let expire = new Date();
-      expire.setMinutes(expire.getMinutes() + 60); // 만료 시간을 60분으로 설정합니다.
+    console.log(user.nickname);
 
-      res.writeHead(200, {
-        "Set-Cookie": `name=sparta; Expires=${expire.toGMTString()}; HttpOnly; Path=/`,
-      });
-      return res.status(200).end();
-      return res.status(200).json({ token: "로그인 성공" });
+    if (!user || password !== user.password) {
+      throw error_message(412, "닉네임 또는 패스워드를 확인해주세요.");
+    } else {
+      // 사용자 정보를 JWT로 생성
+
+      const token = await JWT.sign(
+        { nickname: user.id }, // user 변수의 데이터를 payload에 할당
+        "secretOrPrivateKey", // JWT의 비밀키를 secretOrPrivateKey라는 문자열로 할당
+        { expiresIn: "1h" } // JWT의 인증 만료시간을 1시간으로 설정);
+      );
+      res.cookie("Authorization", `Bearer ${token}`); // JWT를 Cookie로 할당합니다!
+      console.log(token);
+      res.status(200).json({ token: token }); // JWT를 Body로 할당합니다!
     }
   } catch (error) {
     return next(error);
   }
+});
+
+// 내 정보 조회 API
+authos_router.get("/users/me", middleWare, async (req, res) => {
+  console.log("start users/me");
+  //console.log(res.locals);
+  const { nickname, id } = res.locals.user;
+
+  res.status(200).json({
+    user: { nickname, id },
+  });
 });
 
 module.exports = authos_router;
