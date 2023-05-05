@@ -29,8 +29,8 @@ module.exports = async (req, res, next) => {
     next();
   } catch (err) {
     console.error(err);
-    res.status(401).send({
-      errorMessage: "로그인 후 이용 가능한 기능입니다.",
+    res.status(403).send({
+      errorMessage: "전달된 쿠키에서 오류가 발생하였습니다.",
     });
   }
 };

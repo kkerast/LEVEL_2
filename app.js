@@ -23,7 +23,7 @@ app.use((error, req, res, next) => {
   console.log("에러 발생 ");
   const status = error.status || 500;
   const message = error.message || "Internal 500 Error";
-  res.status(status).json({ message: message });
+  res.status(status).json({ errorMessage: message });
 });
 
 app.listen(app.get("port"), () => {
